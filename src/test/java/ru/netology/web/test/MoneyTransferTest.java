@@ -19,7 +19,7 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
     private String fromCard;
     private String toCard;
 
-    private DashboardPage loginAndVerify(int idOfCardSender, int idOfCardRecipient) {
+    private DashboardPage loginVerifyAndGetCards(int idOfCardSender, int idOfCardRecipient) {
         var loginPage = open("http://localhost:9999", LoginPage.class);
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
@@ -43,7 +43,7 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
             "If negative amount, -100"
     })
     public void shouldTransferMoneyBetweenOwnCards(String testName, int amount) {
-        var dashboard = loginAndVerify(1 , 2);
+        var dashboard = loginVerifyAndGetCards(1 , 2);
         var expectedBalanceOfCardFrom = dashboard.getCardBalance(fromCard) - Math.abs(amount);
         var expectedBalanceOfCardTo = dashboard.getCardBalance(toCard) + Math.abs(amount);
 
@@ -54,8 +54,8 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
 
     @Test
     public void shouldTransferMoneyBetweenOwnCardsIfAmountWithKopecks() {
-        var amount = 10.10;
-        var dashboard = loginAndVerify(1 , 2);
+        var amount = 5.5;
+        var dashboard = loginVerifyAndGetCards(1 , 2);
         var expectedBalanceOfCardFrom = dashboard.getCardBalance(fromCard) - amount;
         var expectedBalanceOfCardTo = dashboard.getCardBalance(toCard) + amount;
 
@@ -66,7 +66,7 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
 
     @Test
     public void shouldTransferMoneyBetweenOwnCardsWithMaxAmount() {
-        var dashboard = loginAndVerify(1 , 2);
+        var dashboard = loginVerifyAndGetCards(1 , 2);
         var amount = dashboard.getCardBalance(fromCard);
         double expectedBalanceOfCardFrom = 0;
         double expectedBalanceOfCardTo = dashboard.getCardBalance(toCard) + amount;
@@ -78,7 +78,7 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
 
     @Test
     public void shouldNotTransferIfNotEnoughMoney() {
-        var dashboard = loginAndVerify(2 , 1);
+        var dashboard = loginVerifyAndGetCards(2 , 1);
         var amount = dashboard.getCardBalance(fromCard) + 10;
 
         dashboard.moneyTransfer(fromCard, toCard, Integer.toString(amount));
@@ -93,7 +93,7 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
             "If null card number,",
     })
     public void shouldNotTransferMoneyAndShowError(String testName, String fromCard) {
-        var dashboard = loginAndVerify(1,2);
+        var dashboard = loginVerifyAndGetCards(1,2);
 
         dashboard.moneyTransfer(fromCard, toCard, "100");
         dashboard.getErrorNotification().should(appear).shouldHave(text("Произошла ошибка"));
