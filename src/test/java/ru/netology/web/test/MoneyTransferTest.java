@@ -47,7 +47,8 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
         var expectedBalanceOfCardFrom = dashboard.getCardBalance(fromCard) - Math.abs(amount);
         var expectedBalanceOfCardTo = dashboard.getCardBalance(toCard) + Math.abs(amount);
 
-        dashboard.moneyTransfer(fromCard, toCard, Integer.toString(amount));
+        var transfer = dashboard.selectTargetCard(toCard);
+        transfer.moneyTransfer(fromCard, Integer.toString(amount));
         assertEquals(expectedBalanceOfCardFrom, dashboard.getCardBalance(fromCard));
         assertEquals(expectedBalanceOfCardTo, dashboard.getCardBalance(toCard));
     }
@@ -59,7 +60,8 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
         var expectedBalanceOfCardFrom = dashboard.getCardBalance(fromCard) - amount;
         var expectedBalanceOfCardTo = dashboard.getCardBalance(toCard) + amount;
 
-        dashboard.moneyTransfer(fromCard, toCard, Double.toString(amount));
+        var transfer = dashboard.selectTargetCard(toCard);
+        transfer.moneyTransfer(fromCard, Double.toString(amount));
         assertEquals(expectedBalanceOfCardFrom, dashboard.getCardBalance(fromCard));
         assertEquals(expectedBalanceOfCardTo, dashboard.getCardBalance(toCard));
     }
@@ -71,7 +73,8 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
         double expectedBalanceOfCardFrom = 0;
         double expectedBalanceOfCardTo = dashboard.getCardBalance(toCard) + amount;
 
-        dashboard.moneyTransfer(fromCard, toCard, Integer.toString(amount));
+        var transfer = dashboard.selectTargetCard(toCard);
+        transfer.moneyTransfer(fromCard, Integer.toString(amount));
         assertEquals(expectedBalanceOfCardFrom, dashboard.getCardBalance(fromCard));
         assertEquals(expectedBalanceOfCardTo, dashboard.getCardBalance(toCard));
     }
@@ -81,8 +84,9 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
         var dashboard = loginVerifyAndGetCards(2 , 1);
         var amount = dashboard.getCardBalance(fromCard) + 10;
 
-        dashboard.moneyTransfer(fromCard, toCard, Integer.toString(amount));
-        dashboard.getErrorNotification().should(appear).shouldHave(text("Произошла ошибка"));
+        var transfer = dashboard.selectTargetCard(toCard);
+        transfer.moneyTransfer(fromCard, Integer.toString(amount));
+        transfer.getErrorNotification().should(appear).shouldHave(text("Произошла ошибка"));
     }
 
     @ParameterizedTest
@@ -95,7 +99,8 @@ public class MoneyTransferTest { // java -jar artifacts/app-ibank-build-for-test
     public void shouldNotTransferMoneyAndShowError(String testName, String fromCard) {
         var dashboard = loginVerifyAndGetCards(1,2);
 
-        dashboard.moneyTransfer(fromCard, toCard, "100");
-        dashboard.getErrorNotification().should(appear).shouldHave(text("Произошла ошибка"));
+        var transfer = dashboard.selectTargetCard(toCard);
+        transfer.moneyTransfer(fromCard, "100");
+        transfer.getErrorNotification().should(appear).shouldHave(text("Произошла ошибка"));
     }
 }
